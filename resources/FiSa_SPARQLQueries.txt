@@ -1,0 +1,214 @@
+PREFIX owl: <http://www.w3.org/2002/07/owl#>
+PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX fisa: <https://purl.org/fisa.ttl#>
+PREFIX bot: <https://w3id.org/bot#>
+
+________________________________
+#SPARQL Computations and Inserts
+
+
+
+## Queries for Building Classes:
+
+
+#1 Calculate Total Number of Utilization Units
+
+INSERT {
+ ?individual fisa:hasTotalAmountOfUtilizationSpaces ?count .
+} WHERE {
+SELECT ?individual (COUNT(?utilizationSpaces) AS ?count)
+WHERE {
+  ?individual a bot:Building .
+  ?individual fisa:hasUtilizationSpace ?utilizationSpaces .
+} GROUP BY ?individual
+}
+
+
+#2 Calculate the combined gross floor area of all utilization spaces
+
+DELETE {
+  ?individual fisa:hasCombinedGrossFloorArea ?oldSum .
+}
+INSERT {
+  ?individual fisa:hasCombinedGrossFloorArea ?newSum .
+}
+WHERE {
+  {
+    SELECT ?individual (SUM(?usedGrossFloorArea) AS ?newSum)
+    WHERE {
+      ?individual a bot:Building .
+      ?individual fisa:hasUtilizationSpace ?utilizationSpace .
+      ?utilizationSpace fisa:usesGrossFloorArea ?usedGrossFloorArea .
+      OPTIONAL {
+        ?individual fisa:hasCombinedGrossFloorArea ?oldSum .
+      }
+    }
+    GROUP BY ?individual ?oldSum
+  }
+}
+
+
+#3 Save and insert, if any gross floor areas exceed 400m2 - if no, then true; else if yes, then false.
+
+DELETE {
+  ?individual fisa:under400_meta ?oldResult .
+}
+INSERT {
+  ?individual fisa:under400_meta ?resultValue .
+}
+WHERE {
+  {
+    SELECT ?individual (MAX(?usedGrossFloorArea) AS ?maxValue)
+    WHERE {
+      ?individual a bot:Building.
+      ?individual fisa:hasUtilizationSpace ?utilizationSpace .
+      ?utilizationSpace fisa:usesGrossFloorArea ?usedGrossFloorArea .
+    }
+    GROUP BY ?individual
+  }
+  BIND(IF(?maxValue <= 400, true, false) AS ?resultValue)
+  OPTIONAL {
+    ?individual fisa:under400_meta ?oldResult .
+    FILTER(?oldResult = ?resultValue) 
+  }
+}
+
+
+
+
+
+
+
+## Inference and Insertion of Special Purpose Conditions called "Places of Assembly"
+
+
+
+DELETE {
+  ?individual a ?toBeDeleted .
+}
+WHERE {
+ ?individual a ?toBeDeleted .
+  FILTER(?toBeDeleted = fisa:AssemblyBuilding)
+};
+INSERT {
+?individual a fisa:AssemblyBuilding .
+}WHERE {
+{
+	SELECT ?individual (SUM(?propertyValue) AS ?sumValue) WHERE {
+  	     ?individual a bot:Building .
+ 	     ?individual bot:hasSpace ?space .
+ 	     ?space fisa:isPartOf ?escaperoute .
+ 	     ?space fisa:hasNumberOfVisitors ?propertyValue .
+	} GROUP BY ?individual ?sumValue
+}
+	FILTER (?sumValue > 200 && EXISTS { ?individual fisa:hasEscapeRoute ?escaperoute.})
+}
+
+
+
+
+
+
+
+## Inference and Insertion of Special Purpose Conditions called "Sales Premises" + Adding/Insertion of fisa:hasGFASaleSpaces
+
+
+DELETE {
+  ?individual a ?toBeDeleted .
+  ?individual fisa:hasGFASalesSpaces ?oldSumValue .
+}
+WHERE {
+ ?individual a ?toBeDeleted .
+  FILTER(?toBeDeleted = fisa:SalesPremises)
+  OPTIONAL {
+	?individual fisa:hasGFASalesSpaces ?oldSumValue .
+	}
+};
+INSERT {
+     ?individual a fisa:SalesPremises ; fisa:hasGFASalesSpaces ?sumValue .
+} WHERE {
+{
+	SELECT ?individual (SUM(?propertyValue) AS ?sumValue) WHERE {
+  	     ?individual a bot:Building .
+ 	     ?individual bot:hasStorey ?storey .
+	 	     ?storey bot:hasSpace ?space .
+ 	     ?storey fisa:hasSpaceUsage ?spaceusage .
+ 	     ?space fisa:usesGrossFloorArea ?propertyValue .
+
+	FILTER (?spaceusage IN (fisa:SalseRoom, fisa:StoreStreet))
+	} GROUP BY ?individual
+}
+ 	FILTER (?sumValue > 800)
+}
+
+
+
+
+
+
+
+
+
+
+__________________________________________________________________
+
+#SPARQL Queries - Competency Questions
+
+
+#1 What special purpose conditions have individual general regulations?
+
+
+SELECT DISTINCT ?specialPurposeCondition ?individualSpecialPurposeDescription WHERE {
+  ?specialPurposeCondition rdfs:subClassOf* fisa:SpecialPurposeCondition .
+  ?specialPurposeCondition rdfs:isDefinedBy ?individualSpecialPurposeDescription.
+  
+  OPTIONAL {
+    ?individualSpecialPurposeDescription rdf:type ?class .
+    ?class rdfs:subClassOf* fisa:SpecialPurposeDescription .
+  }
+}
+
+
+
+#3 Which properties and concepts are related to a rescue concept?
+
+SELECT DISTINCT ?rescueConcept ?related WHERE {
+   ?related fisa:subject ?rescueConcept .
+   FILTER (?rescueConcept = fisa:RescueConcept)
+   FILTER (?related != fisa:subject)
+}
+
+
+
+#4 Which components are eligible as a position accessible for fire services (instructible)?
+
+SELECT DISTINCT ?accessiblePositionForFireServices WHERE {
+  fisa:accessibleForFireServices rdf:type owl:DatatypeProperty ;
+                    rdfs:domain ? accessiblePositionForFireServices ;
+  FILTER NOT EXISTS {
+    ?accessiblePositionForFireServices rdf:type owl:Restriction .
+  }
+}
+
+
+
+__________________________________________________________________
+
+#Snap PARQL Queries - Competency Questions
+
+
+
+
+#2 Show all (instantiated) buildings that meet a special purpose condition and if so, which one?*
+
+
+SELECT ?building ?specialPurposeCondition WHERE {
+	?building rdf:type bot:Building .
+	?building rdf:type ?specialPurposeCondition.
+	?specialPurposeCondition rdfs:subClassOf fisa:SpecialPurposeConstruction .
+}
+ORDER BY ?label
+
+
+

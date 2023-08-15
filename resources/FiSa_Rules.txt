@@ -1,0 +1,195 @@
+
+# Building Classes:
+
+§2 (3) 1. a)
+
+bot:Building(?b) ^ fisa:isFreestanding(?b, true) ^ fisa:hasAverageHeight(?b, ?h) ^ swrlb:lessThanOrEqual(?h, 7.0) ^ fisa:hasTotalAmountOfUtilizationUnits(?b, ?nuu) ^ swrlb:lessThanOrEqual(?nuu, 2) ^ fisa:hasCombinedGrossFloorArea(?b, ?cgfa) ^ swrlb:lessThanOrEqual(?cgfa, 400) -> fisa:hasBuildingClass(?b, fisa:BuildingClass1a)
+
+
+§2 (3) 1b
+bot:Building(?b) ^ fisa:isFreestanding(?b, true) ^ fisa:hasUsage(?b, fisa:Agriculture) -> fisa:hasBuildingClass(?b, fisa:BuildingClass1b)
+
+
+§2 (3) 2.
+
+bot:Building(?b) ^ fisa:isFreestanding(?b, false) ^ fisa:hasAverageHeight(?b, ?h) ^ swrlb:lessThanOrEqual(?h, 7.0) ^ fisa:hasTotalAmountOfUtilizationUnits(?b, ?nuu) ^ swrlb:lessThanOrEqual(?nuu, 2) ^ fisa:hasCombinedGrossFloorArea(?b, ?cgfa) ^ swrlb:lessThanOrEqual(?cgfa, 400) -> fisa:hasBuildingClass(?b, fisa:BuildingClass2)
+
+§2 (3) 3. - Teil 1
+
+bot:Building(?b) ^ fisa:hasAverageHeight(?b, ?h) ^ swrlb:lessThanOrEqual(?h, 7.0) ^ fisa:hasTotalAmountOfUtilizationUnits(?b, ?nuu) ^ swrlb:lessThanOrEqual(?nuu, 2) ^ fisa:hasCombinedGrossFloorArea(?b, ?cgfa) ^ swrlb:greaterThan(?cgfa, 400) -> fisa:hasBuildingClass(?b, fisa:BuildingClass3)
+
+§2 (3) 3. - Teil 2
+
+bot:Building(?b) ^ fisa:hasAverageHeight(?b, ?h) ^ swrlb:lessThanOrEqual(?h, 7.0) ^ fisa:hasTotalAmountOfUtilizationUnits(?b, ?nuu) ^ swrlb:greaterThan(?nuu, 2) -> fisa:hasBuildingClass(?b, fisa:BuildingClass3)
+
+
+§2 (3) 4. Teil 1
+bot:Building(?b) ^ fisa:hasAverageHeight(?b, ?h) ^ swrlb:greaterThan(?h, 7.0) ^ swrlb:lessThanOrEqual(?h, 13.0) ^ fisa:under400_meta(?b, true) -> fisa:hasBuildingClass(?b, fisa:BuildingClass4)
+
+§2 (3) 4. Teil 2
+bot:Building(?b) ^ fisa:hasAverageHeight(?b, ?h) ^ swrlb:greaterThan(?h, 7.0) ^ swrlb:lessThanOrEqual(?h, 13.0) ^ fisa:largestUtilizationSpace(?b, ?luu) ^ swrlb:lessThan(?luu, 400.0) -> fisa:hasBuildingClass(?b, fisa:BuildingClass4)
+
+
+§2 (3) 5. Teil 1
+bot:Building(?b) ^ fisa:hasAverageHeight(?b, ?h) ^ swrlb:greaterThan(?h, 7) ^ fisa:under400_meta(?b, false) -> fisa:hasBuildingClass(?b, fisa:BuildingClass5)
+
+
+§2 (3) 5. Teil 2
+bot:Building(?b) ^ fisa:hasAverageHeight(?b, ?h) ^ swrlb:greaterThan(?h, 7) ^ fisa:largestUtilizationSpace(?b, ?luu) ^ swrlb:greaterThanOrEqual(?luu, 400.0) -> fisa:hasBuildingClass(?b, fisa:BuildingClass5)
+
+§2 (3) 5. Teil 3
+bot:Building(?b) ^ fisa:isUndergroundBuilding(?b, true) -> fisa:hasBuildingClass(?b, fisa:BuildingClass5)
+
+
+
+
+
+
+# Load-Bearing Walls - §27 MBO:
+
+§27 (1) 1.
+
+bot:Building(?b), fisa:hasBuildingClass(?b, ?bcl),  SameAs (?bcl, fisa:BuildingClass5), bot:hasStorey(?b, ?st), (not (fisa:Basement))(?st), bot:hasElement(?st, ?c), fisa:Wall(?c), fisa:isLoadBearing(?c, true) -> fisa:hasRequirementOfFireResistance(?c, fisa:fire-resistant)
+
+
+§27 (1) 2.
+
+bot:Building(?b), fisa:hasBuildingClass(?b, ?bcl),  SameAs (?bcl, fisa:BuildingClass4), bot:hasStorey(?b, ?st), (not (fisa:Basement))(?st), bot:hasElement(?st, ?c), fisa:Wall(?owl:c), fisa:isLoadBearing(?c, true) -> fisa:hasRequirementOfFireResistance(?c, fisa:highly-fire-retardent)
+
+
+§27 (1) 3. - Part 1
+
+bot:Building(?b), fisa:hasBuildingClass(?b, ?owl:bcl),  SameAs (?bcl, fisa:BuildingClass2), bot:hasStorey(?b, ?st), (not (fisa:Basement))(?:st), bot:hasElement(?st, ?c), fisa:Wall(?c), fisa:isLoadBearing(?c, true) -> fisa:hasRequirementOfFireResistance(?c, fisa:fire-retardent)
+
+
+§27 (1) 3. - Part 2
+
+bot:Building(?b), fisa:hasBuildingClass(?b, ?bcl),  SameAs (?bcl, fisa:BuildingClass3), bot:hasStorey(?b, ?st), (not (fisa:Basement))(?st), bot:hasElement(?st, ?c), fisa:Wall(?c), fisa:isLoadBearing(?c, true) -> fisa:hasRequirementOfFireResistance(?c, fisa:fire-retardent)
+
+
+§27 (2) 1. - Part 1
+
+bot:Building(?b), fisa:hasBuildingClass(?b, ?bcl),  SameAs (?bcl, fisa:BuildingClass3), bot:hasStorey(?b, ?st), fisa:Basement(?st), bot:hasElement(?st, ?c), fisa:Wall(?c), fisa:isLoadBearing(?c, true) -> fisa:hasRequirementOfFireResistance(?c, fisa:fire-resistant)
+
+
+§27 (2) 1. - Part 2
+
+bot:Building(?b), fisa:hasBuildingClass(?b, ?bcl),  SameAs (?bcl, fisa:BuildingClass4), bot:hasStorey(?b, ?st), fisa:Basement(?st), bot:hasElement(?st, ?c), fisa:Wall(?c), fisa:isLoadBearing(?c, true) -> fisa:hasRequirementOfFireResistance(?c, fisa:fire-resistant)
+
+
+§27 (2) 1. - Part 3
+
+bot:Building(?b), fisa:hasBuildingClass(?b, ?bcl),  SameAs (?bcl, fisa:BuildingClass5), bot:hasStorey(?b, ?st), fisa:Basement(?st), bot:hasElement(?st, ?c), fisa:Wall(?c), fisa:isLoadBearing(?c, true) -> fisa:hasRequirementOfFireResistance(?c, fisa:fire-resistant)
+
+
+§27 (2) 2. - Part 1
+
+bot:Building(?b), fisa:hasBuildingClass(?b, ?bcl), fisa:BuildingClass1(?bcl), bot:hasStorey(?b, ?st), fisa:Basement(?st), bot:hasElement(?st, ?c), fisa:Wall(?c), fisa:isLoadBearing(?c, true) -> fisa:hasRequirementOfFireResistance(?c, fisa:fire-retardent)
+
+
+§27 (2) 2. - Part 2
+
+bot:Building(?b), fisa:hasBuildingClass(?b, ?bcl),  SameAs (?bcl, fisa:BuildingClass2), bot:hasStorey(?b, ?st), fisa:Basement(?st), bot:hasElement(?st, ?c), fisa:Wall(?c), fisa:isLoadBearing(?c, true) -> fisa:hasRequirementOfFireResistance(?c, fisa:fire-retardent)
+
+
+
+
+
+
+# Compartment Wall - §29 MBO
+
+
+§29 (2) 1. - Part 1 -> Requirements according to §29 (3) Part 2
+
+bot:Building(?b) ^ bot:hasStorey(?b, ?st) ^ fisa:hasUtilizationSpace(?st, ?uu) ^ bot:adjacentZone(?uu, ?auu) ^ bot:hasElement(?st, ?cw) ^ fisa:CompartmentWall(?cw) ^ bot:interfaceOf(?cw, ?if) ^ bot:interfaceOf(?auu, ?ifn) ^ sameAs(?if, ?ifn) -> fisa:hasRequirementOfFireResistance(?cw, fisa:feuerhemmend)
+
+
+§29 (2) 1. - Part 1 -> Requirements according to §29 (3) Part 1
+
+bot:Building(?b) ^ bot:hasStorey(?b, ?st) ^ fisa:hasUtilizationSpace(?st, ?uu) ^ bot:adjacentZone(?uu, ?auu) ^ bot:hasElement(?st, ?cw) ^ fisa:CompartmentWall(?cw) ^ bot:interfaceOf(?cw, ?if) ^ bot:interfaceOf(?auu, ?ifn) ^ sameAs(?if, ?ifn) ^ bot:hasElement(?st, ?w) ^ fisa:Wall(?w) ^ fisa:isLoadBearing(?w, true) ^ fisa:hasFireResistance(?w, ?frw) ^ fisa:isMoreFireResistantThan(?frw, fisa:feuerhemmend) -> fisa:hasRequirementOfFireResistance(?cw, ?frw)
+
+
+
+
+
+
+# Non-load-bearing External Walls - §28 MBO
+
+
+#DL QUERY
+
+§28 (2) Sentence 1 - Part 1
+
+bot:Building(?b), fisa:hasBuildingClass(?b, ?bc), (not (fisa:BuildingClass1))(?bc), (not (fisa:BuildingClass2))(?bc), (not (fisa:BuildingClass3))(?bc), bot:hasStorey(?b, ?st), bot:hasSpace(?st, ?sp), bot:hasElement(?sp, ?ew), fisa:ExternalWall(?ew), fisa:isLoadBearing(?ew, false) -> fisa:hasRequirementOfFireBehaviour(?ew, fisa:non-flammable)
+
+§28 (2) Satz 1 - Part 1.1
+
+bot:Building(?b), fisa:hasBuildingClass(?b, ?bc), (not (fisa:BuildingClass1))(?bc), (not (fisa:BuildingClass2))(?bc), (not (fisa:BuildingClass3))(?bc), bot:hasStorey(?b, ?st), bot:hasSpace(?st, ?sp), bot:hasElement(?sp, ?ew), fisa:ExternalWall(?ew), fisa:isLoadBearing(?ew, false), fisa:isSpaceEnclosing(?ew, true), fisa:hasFireResistance(?ew, fisa:fire-retardent) -> fisa:isPermittedWithFireBehaviour(?ew, fisa:flammable)
+
+§28 (2) Satz 1 - Part 1.2
+
+bot:Building(?b), fisa:hasBuildingClass(?b, ?bc), (not (fisa:BuildingClass1))(?bc), (not (fisa:BuildingClass2))(?bc), (not (fisa:BuildingClass3))(?bc), bot:hasStorey(?b, ?st), bot:hasSpace(?st, ?sp), bot:hasElement(?sp, ?ew), fisa:ExternalWall(?ew), fisa:isLoadBearing(?ew, false), fisa:isSpaceEnclosing(?ew, true), fisa:hasFireResistance(?ew, ?fr), fisa:isMoreFireResistantThan(?fr, fisa:fire-retardent) -> fisa:isPermittedWithFireBehaviour(?ew, fisa:flammable)
+
+
+§28 (2) Satz 2 - 3. - Part 1, all Insulations with flammable materials in closed profiles 
+
+bot:Building(?b), fisa:hasBuildingClass(?b, ?bc), (not(fisa:BuildingClass1))(?bc), (not(fisa:BuildingClass2))(?bc), (not(fisa:BuildingClass3))(?bc), bot:hasStorey(?b, ?st), bot:hasSpace(?st, ?sp), bot:hasElement(?sp, ?ew), fisa:ExternalWall(?ew), fisa:isLoadBearing(?ew, false), fisa:isSpaceEnclosing(?ew, true), fisa:hasFireResistance(?ew, fisa:fire-retardent), bot:hasSub-Element(?ew, ?se), fisa:ClosedProfile(?cp), fisa:isSub-ElementOf(?cp, ?ew), fisa:hasFireBehaviour(?cp, fisa:non-flammable), bot:containsElement(?cp, ?i), fisa:Insulation(?i), fisa:hasFireBehaviour(?i, fisa:flammable) -> fisa:hasDescription(?i, "§28 (2) won't apply here.")
+
+
+§28 (2) Satz 2 - 3. - Part 2, all Insulations with other than flammable materials in closed profiles
+
+bot:Building(?b), fisa:hasBuildingClass(?b, ?bc), (not(fisa:BuildingClass1))(?bc), (not(fisa:BuildingClass2))(?bc), (not(fisa:BuildingClass3))(?bc), bot:hasStorey(?b, ?st), bot:hasSpace(?st, ?sp), bot:hasElement(?sp, ?ew), fisa:ExternalWall(?ew), fisa:isLoadBearing(?ew, false), fisa:isSpaceEnclosing(?ew, true), fisa:hasFireResistance(?ew, fisa:fire-retardent), bot:hasSub-Element(?ew, ?se), fisa:ClosedProfile(?cp), fisa:isSub-ElementOf(?cp, ?ew), fisa:hasFireBehaviour(?cp, fisa:non-flammable), bot:containsElement(?cp, ?i), fisa:Insulation(?i), fisa:hasFireBehaviour(?i, ?fb), DifferentFrom(?fb, fisa:flammable) -> fisa:hasDescription(?i, "§28 (2) applies here."), fisa:isPermittedWithFireBehaviour(?i, fisa:flammable)
+
+§28 (2) Satz 2 - 3. - Part 3, all other sub-Components of non-load-bearing external walls
+
+bot:Building(?b), fisa:hasBuildingClass(?b, ?bc), (not(fisa:BuildingClass1))(?bc), (not(fisa:BuildingClass2))(?bc), (not(fisa:BuildingClass3))(?bc), bot:hasStorey(?b, ?st), bot:hasSpace(?st, ?sp), bot:hasElement(?sp, ?ew), fisa:ExternalWall(?ew), fisa:isLoadBearing(?ew, false), fisa:isSpaceEnclosing(?ew, true), fisa:hasFireResistance(?ew, fisa:fire-retardent), bot:hasSub-Element(?ew, ?se), bot:BuildingElement(?se), (not (fisa:Insulation))(?se), (not (fisa:Window))(?se), (not (fisa:Door))(?se), (not (fisa:JointSealing))(?se) -> fisa:isPermittedWithFireBehaviour(?se, fisa:flammable)
+
+
+
+
+
+
+# Fulfilled Special Purpose Conditions lead to the type of Special Purpose Construction
+
+fisa:StructuralFacility(?sf) ^ fisa:SpecialPurposeCondition(?sf) -> fisa:SpecialPurposeConstruction(?sf)
+
+
+# Special Purpose Conditions - examplary
+
+#SWRL - §2 (4) 5. MBO
+bot:Building(?b) ^ bot:hasSpace(?b, ?sp) ^ fisa:hasSpaceUsage(?sp, ?spu) ^ sameAs(?spu, fisa:OfficeRoom) ^ fisa:usesGrossFloorArea(?sp, ?ugfa) ^ swrlb:greaterThan(?ugfa, 400.0) -> fisa:SpecialPurposeConditionAcc§2_S4_P5(?b)
+
+#SWRL - §2 (4) 6. MBO
+bot:Building(?b) ^ bot:hasSpace(?b, ?sp) ^ fisa:hasNumberOfPeople(?sp, ?nop) ^ swrlb:greaterThan(?nop, 100.0) -> fisa:SpecialPurposeConditionAcc§2_S4_P6(?b)
+
+
+
+
+# MVKVO - by example: when is a Sales Premises unregulated and regulated according to Special Purpose Prescriptive MVKVO
+
+#unregulated
+fisa:SalesPremises(?spr) ^ fisa:hasGFASalesSpaces(?spr, ?gfa) ^ swrlb:greaterThan(?gfa, 800.0) ^ swrlb:lessThanOrEqual(?gfa, 2000.0) -> fisa:UnregulatedSpecialPurposeConstruction(?spr)
+
+#regulated
+fisa: SalesPremises(?spr) ^ fisa: hasGFASalesSpaces(?spr, ?gfa) ^ swrlb:greaterThan(?gfa, 2000.0) -> fisa:RegulatedSpecialPurposeConstruction(?spr)
+
+
+
+
+# (Un)fulfilled Load-Bearing
+
+bot:BuildingElement(?be) ^ fisa:isLoadBearing(?be, false) ^ bot:hasSubElement(?be, ?se) -> fisa:isLoadBearing(?se, false)
+
+
+# Fulfilled Space Closure
+fisa:Component(?c) ^ fisa:isSpaceEnclosing(?c, true) ^ bot:hasSubElement(?c, ?se) -> fisa:isSpaceEnclosing(?se, true)
+
+
+
+
+
+
+
+
+
+ 
