@@ -19,7 +19,7 @@
                          <http://purl.org/dc/terms/license> "https://creativecommons.org/licenses/by/4.0/" ;
                          <http://purl.org/dc/terms/title> "Fire Safety Ontology (FiSa)" ;
                          <http://purl.org/vocab/vann/preferredNamespacePrefix> "fisa" ;
-                         <http://purl.org/vocab/vann/preferredNamespaceUri> : ;
+                         <http://purl.org/vocab/vann/preferredNamespaceUri> <https://purl.org/fisa#> ;
                          owl:versionInfo "0.0.1"@en .
 
 #################################################################
