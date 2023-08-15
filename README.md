@@ -11,6 +11,8 @@ The Fire Safety Ontology (FiSa) enables the classification of buildings and its 
 
 
 ### References 
+
+#### for publishing
 [1]	D. Garijo, “WIDOCO: A Wizard for Documenting Ontologies,” in The Semantic Web – ISWC 2017,
 C. d’Amato, M. Fernandez, V. Tamma, F. Lecue, P. Cudré-Mauroux, J. Sequeda, C. Lange, and J. Heflin,
 Eds., in Lecture Notes in Computer Science, vol. 10588. Cham: Springer International Publishing, 2017,
